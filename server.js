@@ -10,32 +10,31 @@ const PORT = process.env.PORT || 3000;
 
 const allowedOrigins = [
   'http://127.0.0.1:5000',
-  'http://localhost:5173/',
+  'http://localhost:5173',
   'https://bellskeet.netlify.app',
   'https://porost.netlify.app',
   'https://bellcabiz.vercel.app',
   'https://bell-webmail-beta.vercel.app',
   'https://greatbellbiz.netlify.app'
-   // add all your trusted frontends here
 ];
 
 // Middlewares
 app.use(helmet());
-app.use(cors());
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (e.g. mobile apps, curl)
     if (!origin) return callback(null, true);
+
     if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
+      callback(null, true);
     } else {
-      return callback(new Error('Not allowed by CORS'));
+      console.log("Blocked by CORS:", origin); // 👈 debug
+      callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
-  credentials: false
 }));
+app.options('*', cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
